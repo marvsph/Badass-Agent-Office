@@ -48,6 +48,7 @@ export class OfficeScene{
   this.sprite=new Image();this.spriteReady=false;this.sprite.onload=()=>{this.spriteReady=true;};this.sprite.src='/assets/office-workers-v1.png';this.walkSprite=new Image();this.walkReady=false;this.walkSprite.onload=()=>{this.walkReady=true;};this.walkSprite.src='/assets/office-workers-walk-v1.png';this.sideSprite=new Image();this.sideReady=false;this.sideSprite.onload=()=>{this.sideReady=true;};this.sideSprite.src='/assets/office-workers-side-walk-v3.png';this.seatedSprite=new Image();this.seatedReady=false;this.seatedSprite.onload=()=>{this.seatedReady=true;};this.seatedSprite.src='/assets/office-workers-seated-v1.png';this.directionSeated=new Image();this.directionSeatedReady=false;this.directionSeated.onload=()=>{this.directionSeatedReady=true;};this.directionSeated.src='/assets/office-workers-seated-directions-v2.png';
   this.activityFrames=ACTIVITY_FRAMES;this.activitySprite=new Image();this.activityReady=false;this.activitySprite.onload=()=>{this.activityReady=true;};this.activitySprite.src='/assets/office-workers-thinking-writing-v1.png';
   this.leisureFrames=LEISURE_FRAMES;this.leisureSprite=new Image();this.leisureReady=false;this.leisureSprite.onload=()=>{this.leisureReady=true;};this.leisureSprite.src='/assets/office-workers-leisure-v1.png';
+  this.roomAgentLimit=24;this.reservationRooms=new Map();this.hiddenAgents=[];
   this.obstacles=[];this.items=[];this.seats=[];this.buildFurniture();
  }
  project(x,y,z=0){return{x,y:y-z};}
@@ -59,22 +60,38 @@ export class OfficeScene{
  round(x,y,w,h,r,color){const c=this.ctx;c.beginPath();c.roundRect(x,y,w,h,r);c.fillStyle=color;c.fill();}
  item(type,x,y,w=0,d=0,extra={}){this.items.push({type,x,y,w,d,...extra});if(w&&d&&extra.block!==false)this.obstacles.push({x:x-7,y:y-7,w:w+14,h:d+14,chairId:extra.chairId});}
  buildFurniture(count=18){
-  this.obstacles=[];this.items=[];this.seats=[];this.spots={};this.zones=[];this.reservations.clear();
+  this.obstacles=[];this.items=[];this.seats=[];this.spots={};this.zones=[];this.reservations.clear();this.reservationRooms.clear();
   const podKinds=['cross','three','cross','three','cross'];let capacity=18;
   while(capacity<count){podKinds.push('cross');capacity+=4;}
-  const extraRows=Math.ceil(Math.max(0,podKinds.length-5)/3),H=760+extraRows*355;
-  this.roomHeight=H;this.floorHeight=H+620;this.floorWidth=Math.max(3400,Math.ceil(this.floorHeight*2.46/20)*20);
-  const W=this.floorWidth,officeW=1220,cafeX=1250,cafeW=Math.max(540,(W-1250)*.29),gameX=cafeX+cafeW+30,gameW=Math.max(650,(W-gameX-60)*.53),libraryX=gameX+gameW+30,libraryW=W-libraryX,lower=H+130;
-  const lowerW=[650,700,590,520],gap=25;let lowerX=0;
+  // Grow the work area in both directions. Shared rooms have bounded widths,
+  // rather than receiving most of the extra footprint for every new desk row.
+  let columns=3,best=Infinity;
+  for(let cols=3;cols<=Math.max(3,podKinds.length);cols++){
+   const rows=Math.ceil(podKinds.length/cols),width=cols*440+2180,height=rows*400+720;
+   if(cols!==Math.max(3,Math.ceil(podKinds.length/rows)))continue;
+   if(width<height*2)continue;
+   const score=Math.abs(Math.log(width/height/2.46))+(cols*rows-podKinds.length)*.012;
+   if(score<best){best=score;columns=cols;}
+  }
+  const rows=Math.ceil(podKinds.length/columns),H=rows*400+100;
+  const officeW=columns*440+80,cafeX=officeW+30,cafeW=620,gameX=cafeX+cafeW+30,gameW=740,libraryX=gameX+gameW+30,libraryW=650;
+  this.roomHeight=H;this.floorHeight=H+620;this.floorWidth=libraryX+libraryW;
+  const W=this.floorWidth,lower=H+130,flexWidth=W-2040;
+  const lowerW=[650,700,590,Math.floor(flexWidth/2)],gap=25;let lowerX=0;
   this.rooms=[{id:'office',label:'WORK PODS',x:0,y:0,w:officeW,h:H},{id:'cafeteria',label:'CAFETERIA',x:cafeX,y:0,w:cafeW,h:H},{id:'game',label:'GAME ROOM',x:gameX,y:0,w:gameW,h:H},{id:'library',label:'LIBRARY',x:libraryX,y:0,w:libraryW,h:H}];
   for(const [i,id]of ['meeting','quiet','reception','focus','studio'].entries()){const width=i<4?lowerW[i]:W-lowerX;this.rooms.push({id,label:{meeting:'TEAM LOUNGE',quiet:'QUIET ROOM',reception:'RECEPTION',focus:'FOCUS ROOM',studio:'PLANNING STUDIO'}[id],x:lowerX,y:lower,w:width,h:490});lowerX+=width+gap;}
   for(const room of this.rooms)room.purpose=ROOM_PURPOSES[room.id];
   const spot=(action,x,y,room,seated=false,facing='front')=>{(this.spots[action]||=[]).push({x,y,room,action,seated,facing,seatAnchor:seated});};
   const chair=(cx,cy,room,actions,color='#cd9573',facing='front')=>{const chairId=room+':'+cx+':'+cy;this.item('orientedChair',cx-33,cy-32,66,64,{color,facing,chairId});for(const action of actions){spot(action,cx,cy,room,true,facing);this.spots[action].at(-1).chairId=chairId;}return chairId;};
-  const centers=[[220,240],[625,235],[1030,240],[430,570],[875,570]];
+  // Balance partial rows, so a single pod never leaves a whole row vacant.
+  const centers=[];
+  for(let row=0;row<rows;row++){
+   const rowCount=Math.floor(podKinds.length/rows)+(row<podKinds.length%rows?1:0);
+   for(let col=0;col<rowCount;col++)centers.push([officeW/2+(col-(rowCount-1)/2)*440,270+row*400]);
+  }
   const faceFromAngle=angle=>{const dx=-Math.cos(angle),dy=-Math.sin(angle);if(Math.abs(dx)<.1)return dy<0?'back':'front';if(Math.abs(dy)<.1)return dx<0?'left':'right';return dy<0?(dx<0?'nw':'ne'):(dx<0?'sw':'se');};
   for(let pod=0;pod<podKinds.length;pod++){
-   const kind=podKinds[pod],[cx,cy]=centers[pod]||[220+((pod-5)%3)*405,930+Math.floor((pod-5)/3)*355];
+   const kind=podKinds[pod],[cx,cy]=centers[pod];
    this.zones.push({x:cx-178,y:cy-168,w:356,h:334,label:'WORK BAY '+String(pod+1).padStart(2,'0'),color:pod%2?'#c6d4c0':'#e4c6a0'});
    const rotation=pod===3?Math.PI:0;this.item('deskPod',cx,cy,0,0,{kind,index:pod,rotation});
    this.obstacles.push({x:cx-107,y:cy-77,w:214,h:154});
@@ -82,18 +99,24 @@ export class OfficeScene{
    for(const baseAngle of angles){const angle=baseAngle+rotation,x=cx+Math.cos(angle)*145,y=cy+Math.sin(angle)*145,facing=faceFromAngle(angle);const chairId=chair(x,y,'office',[],'#7b9294',facing);this.seats.push({x,y,room:'office',action:'typing',seated:true,facing,seatAnchor:true,chairId,pod});}
    this.item('divider',cx-174,cy-181,260,8,{color:'#91a798'});this.item('plant',cx+152,cy+143);
   }
-  this.item('shelf',27,22,160,32);this.item('plant',officeW-55,48);this.item('roundTable',officeW-180,H-115,108,76);
+  this.item('shelf',27,22,160,32);this.item('plant',officeW-55,48);
   this.item('cabinet',cafeX+25,25,cafeW-134,48);this.item('fridge',cafeX+cafeW-90,27,62,65);
-  for(let row=0;row<2;row++)for(let col=0;col<2;col++){const x=cafeX+64+col*235+(row?20:0),y=245+row*242;this.item('roundTable',x,y,136,100);chair(x+26,y+143,'cafeteria',['eating','coffee'],'#b69b7a','back');chair(x+112,y-50,'cafeteria',['eating','coffee'],'#b69b7a','front');}
+  for(let y=245;y<=H-260;y+=320)for(let col=0;col<2;col++){const x=cafeX+64+col*265;this.item('roundTable',x,y,136,100);chair(x+26,y+143,'cafeteria',['eating','coffee'],'#b69b7a','back');chair(x+112,y-50,'cafeteria',['eating','coffee'],'#b69b7a','front');}
   this.item('water',cafeX+23,H-111,30,36);for(let i=0;i<3;i++)spot('water',cafeX+84+i*65,H-68,'cafeteria');this.item('plant',cafeX+cafeW-56,H-78);
   for(let i=0;i<3;i++){const x=gameX+42+i*129;this.item('arcade',x,63,65,58,{color:['#8da779','#cf8667','#719dac'][i]});spot('arcade',x+33,160,'game',false,'back');}
-  this.item('pool',gameX+75,292,205,151);const pool=this.items.at(-1);
-  for(const [x,facing]of [[gameX+32,'right'],[gameX+330,'left']]){spot('billiards',x,370,'game',false,facing);this.spots.billiards.at(-1).table=pool;}
-  this.item('pingpong',gameX+415,323,200,154);for(let i=0;i<2;i++)spot('pingpong',gameX+385,360+i*73,'game',false,'right');
+  this.gameRows=[];
+  for(let y=292;y<=H-400;y+=440){
+   this.gameRows.push(y);this.item('pool',gameX+75,y,205,151);const pool=this.items.at(-1);
+   for(const [x,facing]of [[gameX+32,'right'],[gameX+330,'left']]){spot('billiards',x,y+78,'game',false,facing);this.spots.billiards.at(-1).table=pool;}
+   this.item('pingpong',gameX+415,y+31,200,154);for(let i=0;i<2;i++)spot('pingpong',gameX+385,y+68+i*73,'game',false,'right');
+  }
   this.item('coffeeTable',gameX+230,H-168,112,64);chair(gameX+145,H-110,'game',['resting'],'#879fae','right');chair(gameX+415,H-110,'game',['resting'],'#879fae','left');chair(gameX+280,H-240,'game',['resting'],'#879fae','front');
   for(let i=0;i<3;i++){this.item('shelf',libraryX+24+i*160,29,130,33);spot('shelf-reading',libraryX+85+i*160,155,'library',false,'front');}
-  this.item('divider',libraryX+30,252,libraryW-65,8,{color:'#a0ad93'});this.item('coffeeTable',libraryX+libraryW/2-55,433,110,66);
-  for(const [dx,dy,facing]of [[-125,0,'right'],[125,0,'left'],[0,-105,'front'],[0,112,'back']])chair(libraryX+libraryW/2+dx,466+dy,'library',['reading','library-reading','resting','research'],'#a4a68b',facing);
+  this.item('divider',libraryX+80,252,libraryW-160,8,{color:'#a0ad93'});this.libraryTables=[];
+  for(let y=466;y<=H-190;y+=400){
+   this.libraryTables.push(y);this.item('coffeeTable',libraryX+libraryW/2-55,y-33,110,66);
+   for(const [dx,dy,facing]of [[-125,0,'right'],[125,0,'left'],[0,-105,'front'],[0,112,'back']])chair(libraryX+libraryW/2+dx,y+dy,'library',['reading','library-reading','resting','research'],'#a4a68b',facing);
+  }
   for(const [x,y,facing]of [[libraryX+libraryW-75,340,'sw'],[libraryX+libraryW-110,H-65,'nw']])chair(x,y,'library',['library-reading','corner-reading'],'#91a18c',facing);
   this.item('plant',W-52,H-81);
   const room=id=>this.rooms.find(r=>r.id===id),meeting=room('meeting'),quiet=room('quiet'),reception=room('reception'),focus=room('focus'),studio=room('studio');
@@ -105,11 +128,19 @@ export class OfficeScene{
   this.item('shelf',quiet.x+quiet.w-145,lower+17,115,29);this.item('plant',quiet.x+quiet.w-53,lower+421);
   this.item('reception',reception.x+60,lower+76,reception.w-130,67);this.item('plant',reception.x+reception.w-60,lower+46);this.item('water',reception.x+reception.w-75,lower+362,29,35);
   this.item('coffeeTable',reception.x+218,lower+278,108,67);chair(reception.x+137,lower+311,'reception',['input','reception-rest'],'#bba07d','right');chair(reception.x+402,lower+311,'reception',['input','reception-rest'],'#bba07d','left');chair(reception.x+274,lower+420,'reception',['input','reception-rest'],'#bba07d','back');
-  for(let i=0;i<3;i++){this.item('desk',focus.x+55+i*145,lower+91,106,49,{index:i,chairless:true});chair(focus.x+111+i*145,lower+174,'focus',['reading','reviewing','focusing'],'#849b9c','back');if(i<2)this.item('divider',focus.x+183+i*145,lower+40,8,228,{color:'#99aaa0'});}
+  const focusDesks=Math.floor((focus.w-90)/145);
+  for(let i=0;i<focusDesks;i++){this.item('desk',focus.x+55+i*145,lower+91,106,49,{index:i,chairless:true});chair(focus.x+111+i*145,lower+174,'focus',['reading','reviewing','focusing'],'#849b9c','back');if(i<focusDesks-1)this.item('divider',focus.x+183+i*145,lower+40,8,228,{color:'#99aaa0'});}
   this.item('plant',focus.x+focus.w-53,lower+397);this.item('shelf',focus.x+45,lower+340,130,29);
-  this.item('board',studio.x+35,lower+31,studio.w-90,9,{block:false});this.item('roundTable',studio.x+studio.w/2-83,lower+171,166,118,{meeting:true});
-  chair(studio.x+studio.w/2-116,lower+215,'studio',['planning'],'#829c91','right');chair(studio.x+studio.w/2+116,lower+215,'studio',['planning'],'#829c91','left');chair(studio.x+studio.w/2,lower+336,'studio',['planning'],'#829c91','back');this.item('plant',W-54,lower+409);
-  for(const place of this.spots.planning){place.writingSurface={x:studio.x+studio.w/2+(place.facing==='right'?-63:place.facing==='left'?63:0),y:lower+(place.facing==='back'?245:199),angle:this.chairAngle(place.facing)};}
+  this.item('board',studio.x+35,lower+31,studio.w-90,9,{block:false});this.planningTables=[];
+  const planningTables=Math.max(1,Math.floor(studio.w/440));
+  for(let i=0;i<planningTables;i++){
+   const cx=studio.x+studio.w*(i+.5)/planningTables;this.planningTables.push(cx);this.item('roundTable',cx-83,lower+171,166,118,{meeting:true});
+   for(const [dx,dy,facing]of [[-116,215,'right'],[116,215,'left'],[0,336,'back']]){
+    chair(cx+dx,lower+dy,'studio',['planning'],'#829c91',facing);
+    this.spots.planning.at(-1).writingSurface={x:cx+(facing==='right'?-63:facing==='left'?63:0),y:lower+(facing==='back'?245:199),angle:this.chairAngle(facing)};
+   }
+  }
+  this.item('plant',W-54,lower+409);
   // Low storage stays at the perimeter, leaving chair approaches and aisles open.
   this.item('credenza',libraryX+32,H-73,165,30);
   this.item('credenza',meeting.x+34,lower+435,166,27);
@@ -147,7 +178,7 @@ export class OfficeScene{
   const lights=[];
   for(const room of this.rooms){
    const columns=Math.max(1,Math.floor(room.w/450));
-   for(let i=0;i<columns;i++)lights.push({kind:'ceiling',x:room.x+room.w*(i+.5)/columns,y:room.y+(room.y?95:180),radius:room.y?220:260});
+   for(let y=room.y?95:180;y<room.h-100;y+=400)for(let i=0;i<columns;i++)lights.push({kind:'ceiling',x:room.x+room.w*(i+.5)/columns,y:room.y+y,radius:room.y?220:260});
    for(const x of [room.x+22,room.x+room.w-22])lights.push({kind:'wall',x,y:room.y+(room.y?215:room.h-180),radius:135});
   }
   for(let x=140;x<this.floorWidth;x+=350)lights.push({kind:'hall',x,y:this.roomHeight+76,radius:210});
@@ -186,13 +217,13 @@ export class OfficeScene{
   for(const room of this.rooms){const {x,y,w,h,id}=room;
    this.rect(x+15,y+9,w-30,6,night?'#80908d':'#e1d8bd');
    if(id==='cafeteria'){for(let tx=x+20;tx<x+w-20;tx+=45)for(let ty=y+105;ty<y+h-25;ty+=45){this.rect(tx,ty,42,42,night?'#b9b3990b':'#fff6d216');}this.drawRug(x+26,y+98,w-60,62,night?'#5f6253':'#9aaa86');}
-   if(id==='game')this.drawRug(x+28,y+253,w-56,265,night?'#3b565d':'#7c9b8d');
-   if(id==='library')this.drawRug(x+w/2-195,y+305,390,325,night?'#536358':'#bac0a0');
+   if(id==='game')for(const row of this.gameRows)this.drawRug(x+28,row-39,w-56,265,night?'#3b565d':'#7c9b8d');
+   if(id==='library')for(const cy of this.libraryTables)this.drawRug(x+w/2-195,cy-161,390,325,night?'#536358':'#bac0a0');
    if(id==='meeting')this.drawRug(x+95,y+64,w-190,352,night?'#48606a':'#91aaa9');
    if(id==='quiet'){for(const [dx,dy]of [[166,145],[520,145],[345,363]])this.drawRug(x+dx-145,y+dy-105,290,205,night?'#696451':'#c8b594');}
    if(id==='reception')this.drawRug(x+80,y+216,w-150,240,night?'#696454':'#cfb98c');
    if(id==='focus')this.drawRug(x+32,y+50,w-64,230,night?'#4a625d':'#b8c5ad');
-   if(id==='studio')this.drawRug(x+w/2-190,y+105,380,318,night?'#506358':'#a5b799');
+   if(id==='studio')for(const cx of this.planningTables)this.drawRug(cx-190,y+105,380,318,night?'#506358':'#a5b799');
    // Framed geometric prints are decor, independent of recorded session data.
    if(['library','quiet','meeting','studio'].includes(id)){const px=x+w-99,py=y+35;this.rect(px,py,58,65,'#927659');this.rect(px+5,py+5,48,55,night?'#62756c':'#eee2c4');this.circle(px+30,py+25,13,13,'#c78d65');this.polygon([{x:px+8,y:py+54},{x:px+25,y:py+31},{x:px+49,y:py+54}],'#799887');}
   }
@@ -239,12 +270,51 @@ export class OfficeScene{
  }
 
  fit(width=this.width,height=this.height,reset=false){this.width=width;this.height=height;const bounds=this.overview?{left:-16,right:1770,top:-100,bottom:Math.ceil((this.projects?.length||1)/3)*300+30}:{left:-16,right:1755,top:-115,bottom:727};this.scale=Math.min((width-46)/(bounds.right-bounds.left),(height-88)/(bounds.bottom-bounds.top))*this.zoom;this.offset={x:width/2-(bounds.left+bounds.right)/2*this.scale,y:height/2-(bounds.top+bounds.bottom)/2*this.scale};if(reset)this.pan={x:0,y:0};}
- setAgents(agents){
-  this.agents=agents;const keep=new Set(agents.map(a=>a.id));for(const [id,worker]of this.workers){if(!keep.has(id)){if(worker.claim)this.reservations.delete(worker.claim);this.workers.delete(id);this.deskAssignments.delete(id);}}
-  const required=Math.max(18,agents.length);if(this.seats.length<required){this.buildFurniture(required);for(const worker of this.workers.values()){worker.targetKey=null;worker.claim=null;}}
-  const used=new Set(this.deskAssignments.values());for(const a of agents){let desk=this.deskAssignments.get(a.id);if(desk===undefined){desk=0;while(used.has(desk))desk++;used.add(desk);this.deskAssignments.set(a.id,desk);}
-   let worker=this.workers.get(a.id);if(!worker){worker={id:a.id,x:55+(desk%44)*49,y:this.roomHeight+50+Math.floor(desk/44)*48,action:'walking',room:'reception',seed:hash(a.id),path:[],destination:null,targetKey:null,desk,claim:null,stalled:0};this.workers.set(a.id,worker);}worker.agent=a;worker.desk=desk;
+ admitAgents(agents){
+  const limit=this.roomAgentLimit,spaces={office:limit,studio:Math.min(limit,this.spots.planning.length),reception:Math.min(limit,this.spots.input.length),meeting:Math.min(limit,this.spots.reports.length)};
+  const breakPlaces=new Map();
+  for(const place of Object.values(this.spots).flat())if(!['office','studio'].includes(place.room)&&place.seated){if(!breakPlaces.has(place.room))breakPlaces.set(place.room,new Set());breakPlaces.get(place.room).add(place.chairId);}
+  let breaks=[...breakPlaces.values()].reduce((sum,seats)=>sum+Math.min(limit,seats.size),0);
+  // A newly recorded main session displaces subagents before another main
+  // session. Never fabricate a replacement session or change recorded status.
+  const priority=[...agents].sort((a,b)=>Number(!!a.parentId)-Number(!!b.parentId)||Math.max(Number(b.lastSeen)||0,Number(b.updatedAt)||0)-Math.max(Number(a.lastSeen)||0,Number(a.updatedAt)||0)||String(a.id).localeCompare(String(b.id)));
+  const admitted=new Set();
+  for(const agent of priority){
+   let room=agent.status==='working'?(agent.kind==='planning'&&spaces.studio>0?'studio':'office'):agent.status==='waiting'?'reception':agent.status==='delegating'?'meeting':null;
+   if(room){if(spaces[room]<=0)continue;spaces[room]--;}
+   else{if(breaks<=0)continue;breaks--;}
+   admitted.add(agent.id);
   }
+  return agents.filter(agent=>admitted.has(agent.id));
+ }
+ setAgents(records){
+  let agents=this.admitAgents(records),rebuilt=false;
+  // Allocate tables for admitted workers, so hidden subagents cannot enlarge
+  // the building. Recheck once the larger studio has its extra tables.
+  if(this.seats.length<Math.max(18,agents.length)){this.buildFurniture(Math.max(18,agents.length));rebuilt=true;agents=this.admitAgents(records);}
+  this.hiddenAgents=records.filter(agent=>!agents.some(visible=>visible.id===agent.id));
+  this.agents=agents;const keep=new Set(agents.map(a=>a.id));for(const [id,worker]of this.workers){if(!keep.has(id)){if(worker.claim){this.reservations.delete(worker.claim);this.reservationRooms.delete(worker.claim);}this.workers.delete(id);this.deskAssignments.delete(id);}}
+  const required=Math.max(18,agents.length);if(this.seats.length<required){this.buildFurniture(required);rebuilt=true;}
+  if(this.lastRoomAgentLimit!==this.roomAgentLimit&&this.seats.length>required+8){
+   this.buildFurniture(required);rebuilt=true;
+   const occupied=new Set([...this.deskAssignments.values()].filter(desk=>desk<this.seats.length));
+   for(const [id,desk]of this.deskAssignments)if(desk>=this.seats.length){let available=0;while(occupied.has(available))available++;this.deskAssignments.set(id,available);occupied.add(available);}
+  }
+  if(rebuilt||this.lastRoomAgentLimit!==this.roomAgentLimit){this.reservations.clear();this.reservationRooms.clear();for(const worker of this.workers.values()){
+   // Rebuilt partitions can cover an old seat or arrival point. Re-enter from
+   // the clear corridor while keeping the worker's assigned workstation.
+   Object.assign(worker,this.arrivalPosition(worker.desk),{targetKey:null,claim:null,destination:null,departingChair:null,path:[],pathFailed:false,action:'walking',seated:false});
+  }}
+  this.lastRoomAgentLimit=this.roomAgentLimit;
+  const used=new Set(this.deskAssignments.values());for(const a of agents){let desk=this.deskAssignments.get(a.id);if(desk===undefined){desk=0;while(used.has(desk))desk++;used.add(desk);this.deskAssignments.set(a.id,desk);}
+   let worker=this.workers.get(a.id);if(!worker){worker={id:a.id,...this.arrivalPosition(desk),action:'walking',room:'reception',seed:hash(a.id),path:[],destination:null,targetKey:null,desk,claim:null,stalled:0};this.workers.set(a.id,worker);}worker.agent=a;worker.desk=desk;
+  }
+ }
+ arrivalPosition(desk){const columns=Math.max(1,Math.floor((this.floorWidth-110)/49));return{x:55+(desk%columns)*49,y:this.roomHeight+50+(Math.floor(desk/columns)%2)*40};}
+ reservePlace(worker,target,key,desired){
+  let occupied=0;for(const [claim,room]of this.reservationRooms)if(room===target.room&&this.reservations.has(claim))occupied++;
+  if(occupied>=this.roomAgentLimit)return null;
+  this.reservations.set(key,worker.id);this.reservationRooms.set(key,target.room);worker.claim=key;return{...target,desired};
  }
  blocked(x,y,ignoreChair=null){const ignored=Array.isArray(ignoreChair)?ignoreChair:[ignoreChair];return x<15||y<20||x>this.floorWidth-20||y>this.floorHeight-20||this.obstacles.some(r=>!(r.chairId&&ignored.includes(r.chairId))&&x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h);}
  findPath(start,target,avoid=[]){
@@ -265,13 +335,14 @@ export class OfficeScene{
  }
  choose(worker,time){
   const desired=this.desired(worker,time);if(worker.destination?.desired===desired&&worker.claim&&this.reservations.get(worker.claim)===worker.id)return worker.destination;
-  if(worker.claim){this.reservations.delete(worker.claim);worker.claim=null;}
-  if(['typing','desk-reading'].includes(desired)||(worker.agent.status==='working'&&['research','reviewing'].includes(desired))){const target={...this.seats[worker.desk],action:desired==='desk-reading'?'reading':desired,desired};const key='desk:'+worker.desk;this.reservations.set(key,worker.id);worker.claim=key;return target;}
-  const spots=this.spots[desired]||[];const begin=worker.seed%Math.max(1,spots.length);for(let i=0;i<spots.length;i++){const target=spots[(begin+i)%spots.length],key=target.x+':'+target.y;const owner=this.reservations.get(key);if(owner&&owner!==worker.id)continue;this.reservations.set(key,worker.id);worker.claim=key;return {...target,desired};}
-  if(['planning','research','reviewing'].includes(desired)){const key='desk:'+worker.desk;this.reservations.set(key,worker.id);worker.claim=key;return {...this.seats[worker.desk],action:desired,desired};}
+  if(worker.claim){this.reservations.delete(worker.claim);this.reservationRooms.delete(worker.claim);worker.claim=null;}
+  const atDesk=['typing','desk-reading'].includes(desired)||(worker.agent.status==='working'&&['research','reviewing'].includes(desired));
+  if(atDesk){const target={...this.seats[worker.desk],action:desired==='desk-reading'?'reading':desired},place=this.reservePlace(worker,target,'desk:'+worker.desk,desired);if(place)return place;}
+  const spots=atDesk?[]:this.spots[desired]||[];const begin=worker.seed%Math.max(1,spots.length);for(let i=0;i<spots.length;i++){const target=spots[(begin+i)%spots.length],key=target.x+':'+target.y;const owner=this.reservations.get(key);if(owner&&owner!==worker.id)continue;const place=this.reservePlace(worker,target,key,desired);if(place)return place;}
+  if(['planning','research','reviewing'].includes(desired)){const place=this.reservePlace(worker,{...this.seats[worker.desk],action:desired},'desk:'+worker.desk,desired);if(place)return place;}
   // Full furniture never makes characters stack; overflow workers keep walking in the hallway.
   const patrol=Math.floor(time/10000)+(worker.roamCycle||0);
-  return{x:100+(worker.desk%25)*80+(patrol%2?40:0),y:this.roomHeight+55+(Math.floor(worker.desk/25)%3)*40,room:'reception',action:'walking',desired,seated:false};
+  return{x:100+(worker.desk%25)*80+(patrol%2?40:0),y:this.roomHeight+55+(Math.floor(worker.desk/25)%2)*40,room:'reception',action:'walking',desired,seated:false};
  }
  isWorkerSolid(worker){return worker.action!=='walking';}
  returningToWork(worker){return worker.agent.status==='working'&&['typing','planning','research','reviewing','reading'].includes(worker.destination?.action);}

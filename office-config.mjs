@@ -3,7 +3,7 @@ import path from 'node:path';
 import { randomUUID, createHash } from 'node:crypto';
 import { repositoryWorkspace } from './project-grouping.mjs';
 
-export const defaultConfig = () => ({ officeName: 'Agent Office', logo: null, projects: [] });
+export const defaultConfig = () => ({ officeName: 'Agent Office', logo: null, roomAgentLimit: 24, projects: [] });
 export const configFile = process.env.AGENT_OFFICE_CONFIG || path.join(import.meta.dirname, '.agent-office', 'config.json');
 export const MAX_LOGO_BYTES = 512 * 1024;
 
@@ -33,6 +33,8 @@ const nested = (child, parent) => key(child).startsWith(key(parent.endsWith(path
 export async function validateConfig(input, { checkFolders = true } = {}) {
   if (!input || typeof input !== 'object' || Array.isArray(input)) throw new Error('Invalid office settings.');
   const officeName = name(input.officeName, 'Office name');
+  const roomAgentLimit = input.roomAgentLimit ?? 24;
+  if (!Number.isInteger(roomAgentLimit) || roomAgentLimit < 1 || roomAgentLimit > 100) throw new Error('Room agent limit must be a whole number from 1 to 100.');
   decodeLogo(input.logo);
   if (!Array.isArray(input.projects) || input.projects.length > 50) throw new Error('Add up to 50 project floors.');
   const projects = [];
@@ -54,7 +56,7 @@ export async function validateConfig(input, { checkFolders = true } = {}) {
     if (project.name !== undefined && typeof project.name !== 'string') throw new Error(`${label} name must be text.`);
     projects.push({ name: name(project.name?.trim() || path.basename(folder) || folder, `${label} name`), path: folder });
   }
-  return { officeName, logo: input.logo || null, projects };
+  return { officeName, logo: input.logo || null, roomAgentLimit, projects };
 }
 
 export async function loadConfig(file = configFile) {
@@ -78,7 +80,7 @@ export async function saveConfig(input, file = configFile) {
 
 export function publicOffice(config) {
   const version = config.logo ? createHash('sha256').update(config.logo).digest('hex').slice(0, 16) : '';
-  return { name: config.officeName, logoUrl: version ? `/api/office-logo?v=${version}` : null };
+  return { name: config.officeName, logoUrl: version ? `/api/office-logo?v=${version}` : null, roomAgentLimit: config.roomAgentLimit ?? 24 };
 }
 
 export const configRevision = config => createHash('sha256').update(JSON.stringify(config)).digest('hex');

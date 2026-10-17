@@ -30,7 +30,7 @@ test('local configuration API requires origin/token, persists settings and refre
   const world=await (await fetch(base+'/api/world')).json();assert.equal(world.connected,false);assert.deepEqual(world.projects,[]);assert.ok(world.csrfToken);
   const original=await (await fetch(base+'/api/configuration')).json();
   const png='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jN1sAAAAASUVORK5CYII=';
-  const request={...original,officeName:'Test Studio',logo:png,projects:[{name:'My Project',path:project}]};
+  const request={...original,officeName:'Test Studio',logo:png,roomAgentLimit:12,projects:[{name:'My Project',path:project}]};
   const post=(body,headers={})=>fetch(base+'/api/configuration',{method:'POST',headers:{'Content-Type':'application/json',Origin:base,'X-Office-Token':world.csrfToken,...headers},body:JSON.stringify(body)});
   assert.equal((await post(request,{Origin:'https://outside.example'})).status,403);
   assert.equal((await post(request,{'X-Office-Token':'bad'})).status,403);
@@ -39,10 +39,12 @@ test('local configuration API requires origin/token, persists settings and refre
   });
   assert.equal(foreignHost,403);
   assert.equal((await post({...request,projects:[{path:'relative'}]})).status,400);
+  assert.equal((await post({...request,roomAgentLimit:0})).status,400);
   const response=await post(request);assert.equal(response.status,200);const saved=await response.json();
   assert.equal((await post(request)).status,409,'stale tabs cannot overwrite new settings');
   const updated=await (await fetch(base+'/api/world')).json();
   assert.equal(updated.office.name,'Test Studio');assert.equal(updated.projects[0].name,'My Project');assert.equal(updated.projects[0].count,0);
+  assert.equal(updated.office.roomAgentLimit,12);
   const logo=await fetch(base+updated.office.logoUrl);assert.equal(logo.headers.get('content-type'),'image/png');assert.ok((await logo.arrayBuffer()).byteLength>8);
   assert.equal((await fetch(base+'/.agent-office/config.json')).status,404);
   const task=await fetch(base+'/api/tasks',{method:'POST',headers:{'Content-Type':'application/json',Origin:base,'X-Office-Token':world.csrfToken},body:JSON.stringify({projectPath:dir,prompt:'Review',mode:'read-only'})});

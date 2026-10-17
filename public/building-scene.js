@@ -6,7 +6,7 @@ export class BuildingScene{
  point(x,y){return{x,y};}
  setAgents(agents){
   this.agents=agents;const order=new Map(this.projects.map((p,i)=>[p.path,i]));
-  for(const project of this.projects){let floor=this.floors.get(project.path);if(!floor){floor=new OfficeScene(this.canvas);floor.company=project.name;this.floors.set(project.path,floor);}floor.company=project.name;floor.order=order.get(project.path);floor.setAgents(agents.filter(a=>a.projectPath===project.path));}
+  for(const project of this.projects){let floor=this.floors.get(project.path);if(!floor){floor=new OfficeScene(this.canvas);floor.company=project.name;this.floors.set(project.path,floor);}floor.company=project.name;floor.order=order.get(project.path);floor.roomAgentLimit=this.roomAgentLimit??24;floor.setAgents(agents.filter(a=>a.projectPath===project.path));}
   const keep=new Set(this.projects.map(p=>p.path));for(const path of this.floors.keys())if(!keep.has(path))this.floors.delete(path);
   const values=[...this.floors.values()].sort((a,b)=>a.order-b.order);let rowY=0;
   this.columnWidth=Math.max(1400,...values.map(f=>f.floorWidth))+220;this.buildingWidth=Math.max(this.bossRoom.w,values.length>1?this.columnWidth*2-280:this.columnWidth-280);this.bossRoom.x=(this.buildingWidth-this.bossRoom.w)/2;

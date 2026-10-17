@@ -33,6 +33,15 @@ test('folder validation rejects relative paths, files, duplicate and nested floo
   await assert.rejects(validateConfig({...config,projects:Array.from({length:51},()=>({path:dir}))}),/50/);
 });
 
+test('room limits default for existing settings and reject invalid values without overwriting them',async t=>{
+ const dir=await fixture(t),file=path.join(dir,'config.json'),base={officeName:'Office',logo:null,projects:[]};
+ const saved=await saveConfig({...base,roomAgentLimit:12},file);
+ assert.equal((await loadConfig(file)).roomAgentLimit,12);assert.equal(publicOffice(saved).roomAgentLimit,12);
+ for(const roomAgentLimit of [0,-1,101,1.5,'24',NaN])await assert.rejects(saveConfig({...base,roomAgentLimit},file),/Room agent limit/);
+ assert.deepEqual(await loadConfig(file),saved);
+ assert.equal((await validateConfig(base)).roomAgentLimit,24);
+});
+
 test('worktree inputs use the main repository floor',async t=>{
   const dir=await fixture(t),main=path.join(dir,'main'),worktree=path.join(dir,'worktree');
   const gitdir=path.join(main,'.git','worktrees','branch');
@@ -52,7 +61,7 @@ test('logos exclude external URLs, active SVG, disguised files and oversized ima
 test('missing folders can be loaded for correction; corrupt settings are never replaced',async t=>{
   const dir=await fixture(t),file=path.join(dir,'config.json');
   const config={officeName:'Office',logo:null,projects:[{name:'Removed',path:path.join(dir,'removed')}]};
-  await fs.writeFile(file,JSON.stringify(config));assert.deepEqual(await loadConfig(file),config);
+  await fs.writeFile(file,JSON.stringify(config));assert.deepEqual(await loadConfig(file),{...config,roomAgentLimit:24});
   await fs.writeFile(file,'broken');await assert.rejects(loadConfig(file),/has not been changed/);
   assert.equal(await fs.readFile(file,'utf8'),'broken');
 });

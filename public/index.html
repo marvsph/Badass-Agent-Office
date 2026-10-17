@@ -59,6 +59,8 @@
     <form id="configuration-form">
       <fieldset id="configuration-fields" class="configuration-fields">
         <label for="configuration-office-name">Office name</label><input id="configuration-office-name" required maxlength="80" autocomplete="organization" placeholder="Your team's office">
+        <label for="configuration-room-limit">Maximum agents per room</label><input id="configuration-room-limit" type="number" min="1" max="100" step="1" required value="24">
+        <p class="helper">Main sessions take priority when rooms fill up. Extra subagents leave the floor; their records stay available in the session list.</p>
         <label for="configuration-logo">Custom logo <small>(optional)</small></label>
         <div class="logo-settings"><img id="logo-preview" alt="Office logo preview" hidden><div><input id="configuration-logo" type="file" accept="image/png,image/jpeg,image/webp"><p class="helper">PNG, JPEG, or WebP · up to 512 KB</p><button id="remove-logo" class="text-button" type="button" hidden>Remove logo</button></div></div>
         <div class="configuration-section-heading"><h3>Project floors</h3><button id="add-floor" class="secondary-button" type="button">+ Add floor</button></div>

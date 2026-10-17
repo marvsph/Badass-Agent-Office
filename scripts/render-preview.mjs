@@ -19,17 +19,25 @@ const activity=await loadImage(path.join(root,'public/assets/office-workers-thin
 const leisure=await loadImage(path.join(root,'public/assets/office-workers-leisure-v1.png'));
 for(const image of [atlas,walking,seated,sideways,directionSeated,activity,leisure]){Object.defineProperty(image,'naturalWidth',{get:()=>image.width});Object.defineProperty(image,'naturalHeight',{get:()=>image.height});}
 const previewWidth=Number(process.argv[2])||1400,previewHeight=Number(process.argv[3])||850;
+const workerOption=process.argv.find(arg=>arg.startsWith('--workers='));
+const fixtureWorkers=workerOption?Number(workerOption.slice('--workers='.length)):null;
+if(workerOption&&(!Number.isInteger(fixtureWorkers)||fixtureWorkers<1||fixtureWorkers>1000))throw new Error('--workers must be an integer from 1 to 1000');
+const fixtureSubagents=process.argv.includes('--subagents');
 const config=await loadConfig();
-const canvas=createCanvas(previewWidth,previewHeight),scene=new BuildingScene(canvas),world=snapshot({projects:config.projects});
+const canvas=createCanvas(previewWidth,previewHeight),scene=new BuildingScene(canvas),world=fixtureWorkers?{
+ projects:[{name:'Crowded office preview',path:'preview',active:true}],connected:false,
+ sessions:Array.from({length:fixtureWorkers},(_,i)=>({id:'preview-'+i,name:'Worker '+(i+1),parentId:fixtureSubagents&&i>0&&i<fixtureWorkers-1?'preview-0':null,projectPath:'preview',status:'working',kind:i%8===7?'planning':'coding',colorIndex:i%8,lastSeen:Date.now(),updatedAt:Date.now()}))
+}:snapshot({projects:config.projects});
 scene.officeName=config.officeName;
+scene.roomAgentLimit=config.roomAgentLimit??24;
 world.sessions=nameWorkers(world.sessions);
 const bossDetail=process.argv[4]==='boss-desk',boss=process.argv[4]==='boss'||bossDetail;scene.theme=['cozy','fresh','night'].includes(process.argv[5])?process.argv[5]:'cozy';
 scene.projects=world.projects;scene.activeProject=boss?'':world.projects.find(p=>p.active)?.path||world.projects[0]?.path;scene.report=buildBossReport(world);scene.connected=world.connected;
 scene.setAgents(recentWorkers(world.sessions));scene.fit(previewWidth,previewHeight,true);
 for(const floor of [scene.bossPainter,...scene.floors.values()]){floor.sprite=atlas;floor.spriteReady=true;floor.walkSprite=walking;floor.walkReady=true;floor.seatedSprite=seated;floor.seatedReady=true;floor.sideSprite=sideways;floor.sideReady=true;floor.directionSeated=directionSeated;floor.directionSeatedReady=true;floor.activitySprite=activity;floor.activityReady=true;floor.leisureSprite=leisure;floor.leisureReady=true;}
-for(let frame=0;frame<2400;frame++)for(const floor of scene.floors.values())floor.update(frame*16.667);
+for(let frame=0;frame<2400;frame++)for(const floor of scene.floors.values())floor.update(frame*(fixtureWorkers?50:16.667));
 if(bossDetail){scene.targetScale=Math.min((previewWidth-60)/900,(previewHeight-50)/520);scene.targetOffset={x:previewWidth/2-(scene.bossRoom.x+910)*scene.targetScale,y:previewHeight/2-(scene.bossRoom.y+530)*scene.targetScale};}
 scene.scale=scene.targetScale;scene.offset={...scene.targetOffset};scene.render(Number(process.argv[6])||(bossDetail?5000:40000));
 const c=canvas.getContext('2d');c.globalCompositeOperation='destination-over';c.fillStyle=scene.theme==='night'?'#253447':'#e9eee8';c.fillRect(0,0,previewWidth,previewHeight);
-const out=path.join(root,'output'),filename=boss?`boss-${bossDetail?'desk':'preview'}-${scene.theme}-${previewWidth}.png`:'office-preview.png';fs.mkdirSync(out,{recursive:true});const png=canvas.toBuffer('image/png');fs.writeFileSync(path.join(out,filename),png);if(!boss)fs.writeFileSync(path.join(out,`office-preview-${scene.theme}-${previewWidth}.png`),png);
-const focused=scene.floors.get(scene.activeProject);console.log(JSON.stringify({image:path.join(out,filename),focused:focused?.company||'Boss room',workers:focused?.workers.size||0,seated:focused?[...focused.workers.values()].filter(w=>w.seated).length:1,walking:focused?[...focused.workers.values()].filter(w=>w.action==='walking').length:0,pathFailures:focused?[...focused.workers.values()].filter(w=>w.pathFailed).length:0,rooms:focused?.rooms.map(r=>r.label)},null,2));
+const out=path.join(root,'output'),filename=fixtureWorkers?`office-preview-${fixtureWorkers}-workers.png`:boss?`boss-${bossDetail?'desk':'preview'}-${scene.theme}-${previewWidth}.png`:'office-preview.png';fs.mkdirSync(out,{recursive:true});const png=canvas.toBuffer('image/png');fs.writeFileSync(path.join(out,filename),png);if(!boss&&!fixtureWorkers)fs.writeFileSync(path.join(out,`office-preview-${scene.theme}-${previewWidth}.png`),png);
+const focused=scene.floors.get(scene.activeProject);console.log(JSON.stringify({image:path.join(out,filename),focused:focused?.company||'Boss room',records:world.sessions.length,workers:focused?.workers.size||0,hidden:focused?.hiddenAgents.length||0,roomLimit:scene.roomAgentLimit,seated:focused?[...focused.workers.values()].filter(w=>w.seated).length:1,walking:focused?[...focused.workers.values()].filter(w=>w.action==='walking').length:0,pathFailures:focused?[...focused.workers.values()].filter(w=>w.pathFailed).length:0,rooms:focused?.rooms.map(r=>r.label)},null,2));

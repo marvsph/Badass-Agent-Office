@@ -22,6 +22,8 @@ test('Configure loads local settings, edits floors, saves with the page token an
   vm.runInContext("installOfficeSettings({token:()=> 'local-token',onSaved:updated})",context);
   await listeners.get('configure:click')();assert.equal(el('configure-dialog').open,true);assert.equal(el('configuration-office-name').value,'Studio');
   listeners.get('configuration-office-name:input')({target:{value:'My Office'}});
+  assert.equal(el('configuration-room-limit').value,24);
+  listeners.get('configuration-room-limit:input')({target:{value:'12'}});
   listeners.get('add-floor:click')();assert.match(el('configuration-floors').innerHTML,/Floor 2/);
   const input=listeners.get('configuration-floors:input');
   input({target:{dataset:{floorIndex:'1',floorField:'path'},value:'C:/Projects/new'}});
@@ -30,6 +32,7 @@ test('Configure loads local settings, edits floors, saves with the page token an
   let prevented=false;
   await listeners.get('configuration-form:submit')({preventDefault(){prevented=true;}});
   assert.ok(prevented);assert.equal(saved.officeName,'My Office');assert.deepEqual(saved.projects,[{name:'New floor',path:'C:/Projects/new'}]);assert.equal(saved.revision,'revision-1');assert.equal(updated,1);assert.equal(el('configure-dialog').open,false);
+  assert.equal(saved.roomAgentLimit,12);
   vm.runInContext("applyOfficeBranding({name:'<script>Office</script>',logoUrl:'/api/office-logo?v=abc'})",context);
   assert.equal(el('brand-name').textContent,'<script>Office</script>');assert.equal(el('brand-logo').src,'/api/office-logo?v=abc');assert.equal(el('brand-default').hidden,true);
   vm.runInContext('applyOfficeBranding({name:"Office",logoUrl:null})',context);assert.equal(el('brand-logo').hidden,true);

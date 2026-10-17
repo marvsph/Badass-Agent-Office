@@ -14,7 +14,7 @@ test('workers reserve separate quiet-room armchairs and walk there without stack
  for(let i=0;i<workers.length;i++)for(let j=i+1;j<workers.length;j++)assert.ok(Math.hypot(workers[i].x-workers[j].x,workers[i].y-workers[j].y)>=28,'worker bodies do not occupy the same place');
 });
 test('each worker has a stable individual work table',()=>{
- const scene=new OfficeScene(createCanvas(1000,700));const agents=Array.from({length:30},(_,i)=>agent('desk-'+i,'working'));scene.setAgents(agents);
+ const scene=new OfficeScene(createCanvas(1000,700));scene.roomAgentLimit=40;const agents=Array.from({length:30},(_,i)=>agent('desk-'+i,'working'));scene.setAgents(agents);
  const desks=new Map(scene.deskAssignments);assert.equal(new Set(desks.values()).size,30);scene.setAgents([...agents].reverse());assert.deepEqual(scene.deskAssignments,desks);
 });
 
@@ -41,7 +41,7 @@ test('every room activity and individual workstation is reachable from the corri
  for(const target of [...scene.seats,...Object.values(scene.spots).flat()])assert.ok(scene.findPath(start,target).length>0,`${target.room}: ${target.action}`);
 });
 test('floor footprint is a wide rectangle and projection has no slanted edges',()=>{
- const scene=new OfficeScene(createCanvas(1000,700));assert.ok(scene.floorHeight<=1450,'normal project office stays compact');
+ const scene=new OfficeScene(createCanvas(1000,700));assert.ok(scene.floorHeight<=1600,'normal project office stays compact with wider pod aisles');
  assert.ok(scene.floorWidth>=scene.floorHeight*2,'normal floors keep the approved wide footprint');
  assert.equal(scene.project(100,0).x,scene.project(100,600).x);assert.equal(scene.project(0,600).y,scene.project(600,600).y);
  scene.setAgents(Array.from({length:180},(_,i)=>agent('large-'+i)));assert.ok(scene.floorWidth>=scene.floorHeight*2,'expanded floors keep a wide footprint');

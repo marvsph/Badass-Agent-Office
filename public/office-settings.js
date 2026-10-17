@@ -31,7 +31,7 @@ export function installOfficeSettings({token,onSaved}) {
     try{
       const response=await fetch('/api/configuration',{signal:AbortSignal.timeout(7000)});
       if(!response.ok)throw new Error('Could not load office settings.');
-      draft=await response.json();el('configuration-office-name').value=draft.officeName;el('configuration-logo').value='';
+      draft=await response.json();el('configuration-office-name').value=draft.officeName;el('configuration-logo').value='';el('configuration-room-limit').value=draft.roomAgentLimit??24;
       renderFloors();previewLogo();el('configuration-form').hidden=false;status('');
     }catch(error){status(error.message,true);}finally{busy=false;buttons();}
   }
@@ -40,6 +40,7 @@ export function installOfficeSettings({token,onSaved}) {
   el('close-configure').addEventListener('click',()=>dialog.close());
   el('cancel-configuration').addEventListener('click',()=>dialog.close());
   el('configuration-office-name').addEventListener('input',event=>{if(draft)draft.officeName=event.target.value;});
+  el('configuration-room-limit').addEventListener('input',event=>{if(draft)draft.roomAgentLimit=Number(event.target.value);});
   el('configuration-floors').addEventListener('input',event=>{
     const {floorIndex,floorField}=event.target.dataset;
     if(draft&&draft.projects[Number(floorIndex)]&&['name','path'].includes(floorField))draft.projects[Number(floorIndex)][floorField]=event.target.value;
