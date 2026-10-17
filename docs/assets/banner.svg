@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="460" viewBox="0 0 1400 460" role="img" aria-labelledby="title desc">
+  <title id="title">Badass Agent Office</title>
+  <desc id="desc">Your agents. One address. A local pixel office for Codex, Claude Code, and Copilot CLI.</desc>
+  <defs>
+    <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#b7d0ac" opacity=".12"/></pattern>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#132e2b"/><stop offset="1" stop-color="#223d34"/></linearGradient>
+    <linearGradient id="glass" x2="1" y2="1"><stop stop-color="#a4c5a0"/><stop offset="1" stop-color="#668b79"/></linearGradient>
+  </defs>
+  <rect width="1400" height="460" rx="20" fill="url(#bg)"/>
+  <rect width="1400" height="460" rx="20" fill="url(#grid)"/>
+  <path d="M0 439h1400" stroke="#e69b74" stroke-width="2" opacity=".3"/>
+  <g font-family="Segoe UI,Arial,sans-serif">
+    <rect x="64" y="48" width="10" height="10" fill="#eaa581"/>
+    <text x="88" y="58" fill="#c4d2bb" font-size="13" font-weight="600" letter-spacing="3">BIG IDEAS. TINY COWORKERS.</text>
+    <text x="58" y="169" fill="#f6edd7" font-size="94" font-weight="800" letter-spacing="-4">BADASS</text>
+    <text x="58" y="263" fill="#f6edd7" font-size="94" font-weight="800" letter-spacing="-4">AGENT OFFICE<tspan fill="#e99b78">.</tspan></text>
+    <text x="64" y="320" fill="#d6dec9" font-size="24">Your agents. One address.</text>
+    <text x="64" y="355" fill="#a7bba5" font-size="17">Real recorded activity. A whole little world to watch.</text>
+    <text x="64" y="411" fill="#eaa581" font-size="12" font-weight="600" letter-spacing="2.5">LOCAL BY DESIGN</text>
+    <text x="262" y="411" fill="#a7bba5" font-size="12" letter-spacing="2">CODEX / CLAUDE CODE / COPILOT CLI</text>
+  </g>
+  <g transform="translate(979 70)">
+    <path d="M-30 325h350M-14 340h318" stroke="#658371" stroke-width="2"/>
+    <path d="M6 306V59l131-47 151 47v247" fill="#18332f" stroke="#82a28b" stroke-width="3"/>
+    <path d="M6 59l131 49 151-49M137 108v198" fill="none" stroke="#82a28b" stroke-width="3"/>
+    <path d="M6 144l131 47 151-47M6 225l131 47 151-47" fill="none" stroke="#82a28b" stroke-width="3"/>
+    <g fill="url(#glass)">
+      <path d="M27 85l30 11v33l-30-11zM76 103l30 11v33l-30-11zM27 168l30 11v33l-30-11zM76 186l30 11v33l-30-11zM27 249l30 11v33l-30-11zM76 267l30 11v33l-30-11z"/>
+      <path d="M167 119l36-12v30l-36 12zM224 99l36-12v30l-36 12zM167 202l36-12v30l-36 12zM224 182l36-12v30l-36 12zM167 283l36-12v30l-36 12zM224 263l36-12v30l-36 12z"/>
+    </g>
+    <path d="M224 182l36-12v30l-36 12zM76 103l30 11v33l-30-11z" fill="#edb77f"/>
+    <rect x="124" y="-10" width="28" height="28" rx="4" fill="#e99b78"/>
+    <path d="M131 3h14M138-4v14" stroke="#17312b" stroke-width="3"/>
+    <g fill="#e99b78"><rect x="-31" y="77" width="7" height="7"/><rect x="312" y="199" width="7" height="7"/><rect x="285" y="12" width="5" height="5"/></g>
+  </g>
+</svg>

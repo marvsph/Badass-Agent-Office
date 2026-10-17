@@ -1,0 +1,19 @@
+{
+  "name": "badass-agent-office",
+  "version": "0.1.0",
+  "description": "A badass pixel headquarters for your AI agents. Watch Codex, Claude Code, and Copilot CLI work across project floors, inspect recorded activity, catch requests for your input, and launch new tasks. Local by design. Big ideas. Tiny coworkers.",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "prestart": "node scripts/check-node.mjs",
+    "start": "node server.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "devDependencies": {
+    "@napi-rs/canvas": "^1.0.11"
+  }
+}

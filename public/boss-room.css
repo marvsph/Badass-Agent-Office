@@ -1,0 +1,62 @@
+.boss-nav{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;margin:0 0 12px;padding:9px 10px;border:1px solid #c3d4c7;border-radius:8px;background:#edf3e9;color:#405f4e;text-align:left;font:600 12px 'Segoe UI',sans-serif}.boss-nav>span:first-child{font-size:19px;color:#9a793e}.boss-nav small{display:block;font-size:9px;font-weight:400;color:#718575;margin-top:2px}.boss-nav[aria-pressed=true]{background:#405f4e;color:#fff9e8;border-color:#405f4e}.boss-nav[aria-pressed=true] small{color:#cbdcc8}.boss-nav .boss-count{margin-left:auto;border-radius:4px;font-size:10px;background:#ffffff33;padding:3px 6px}.boss-jump{min-height:36px;padding:7px 12px;background:#edf3e9;color:#405f4e;border:1px solid #c3d4c7;border-radius:7px;font:600 10px 'Segoe UI',sans-serif}.boss-jump[aria-pressed=true]{background:#405f4e;color:#fff9e8}.boss-report{margin-top:22px;background:var(--white);border:1px solid var(--line);border-radius:12px;padding:24px;scroll-margin-top:20px}.boss-report-heading{display:flex;justify-content:space-between;align-items:center;gap:16px}.boss-report-heading h2{font:400 29px/1.2 Georgia,serif;color:#405f4e;margin:7px 0}.boss-report-heading p{font-size:11px;color:var(--muted);line-height:1.7;margin:6px 0}.boss-live{display:flex;align-items:center;gap:7px;font-size:10px;color:#718575;white-space:nowrap}.boss-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:19px 0}.boss-metric{border:1px solid #e4e8dc;border-radius:8px;background:#f6f7ee;padding:13px 15px}.boss-metric strong{display:block;font:600 23px/1.2 'Segoe UI',sans-serif;color:#405f4e}.boss-metric span{font-size:10px;color:#748478}.boss-status{display:flex;flex-wrap:wrap;gap:8px 15px;font-size:10px;color:#647c6d;padding-bottom:18px;border-bottom:1px solid var(--line)}.boss-status span{display:inline-flex;align-items:center;gap:7px}.boss-columns{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:24px;margin-top:21px}.boss-column{min-width:0}.boss-column>h3,.boss-projects h3{font-size:12px;color:#405f4e;font-weight:600;margin:0 0 9px}.boss-update,.boss-attention{display:flex;align-items:start;gap:11px;padding:11px 0;border-top:1px solid #edf0e5}.boss-update .activity-badge{margin-top:1px}.boss-update-copy{flex:1;min-width:0;font-size:11px;color:#526c5c;line-height:1.6}.boss-update-copy strong{font-weight:600}.boss-update-copy small{display:block;font-size:10px;color:#849184;overflow-wrap:anywhere}.boss-inspect{display:inline-flex;align-items:center;justify-content:center;min-height:36px;min-width:52px;padding:7px 10px;border:1px solid #dbe2d1;border-radius:6px;background:#f5f7ed;color:#4d6b59;font:10px 'Segoe UI',sans-serif;white-space:nowrap}.boss-attention-copy{flex:1;font-size:11px;line-height:1.6;color:#556e5e}.boss-attention-copy small{display:block;color:#849184;font-size:10px}.boss-empty{font-size:11px;color:#849184;line-height:1.8;background:#f4f6ed;border-radius:7px;padding:13px}.boss-projects{margin-top:24px;padding-top:19px;border-top:1px solid var(--line)}.boss-table-wrap{max-height:390px;overflow:auto;border:1px solid #e4e8dc;border-radius:8px}.boss-table{width:100%;border-collapse:collapse;text-align:left;font-size:10px;line-height:1.6}.boss-table thead{position:sticky;top:0;z-index:1;background:#edf2e6;color:#657b6b}.boss-table th{font-weight:600}.boss-table th,.boss-table td{padding:11px 12px;border-bottom:1px solid #e8ecdf;vertical-align:middle}.boss-table tbody tr:last-child td{border-bottom:0}.boss-table td:first-child{font-weight:600;color:#4d6b59;max-width:200px;overflow-wrap:anywhere}.boss-table .boss-numbers{white-space:nowrap;color:#748574;font-weight:400}.boss-table .boss-record{max-width:270px;color:#7b8b7d;font-weight:400}.boss-record small{display:block;color:#9aab97;font-size:9px}.boss-coverage{font-size:10px;line-height:1.8;color:#8b9886;margin:17px 0 0}.boss-report[data-connected=false] .boss-live .live-dot{background:#d89b40}.boss-report[data-connected=false] .boss-live{color:#a37d34}.boss-report button:focus-visible,.boss-nav:focus-visible,.boss-jump:focus-visible{outline:3px solid #b39762;outline-offset:3px}.boss-report .boss-tools{display:flex;gap:8px;flex-wrap:wrap}.night-mode .boss-report{border-color:#c5cfc3}@media(max-width:1100px){.boss-report{padding:20px}.boss-columns{gap:18px}.boss-table th,.boss-table td{padding:10px 9px}.boss-table .boss-record{max-width:160px}}@media(max-width:800px){.boss-nav{display:none}.boss-report{padding:18px}.boss-report-heading{align-items:start;flex-direction:column;gap:6px}.boss-report-heading h2{font-size:26px}.boss-metrics{gap:7px;margin-top:15px}.boss-metric{padding:10px}.boss-metric strong{font-size:21px}.boss-columns{grid-template-columns:1fr;gap:20px}.boss-jump{min-height:36px}.boss-table .boss-record{display:none}.boss-table td:first-child{max-width:140px}.boss-table th,.boss-table td{padding:10px 8px}.boss-table .boss-numbers{white-space:normal;min-width:95px}.boss-report .boss-tools button{min-height:44px}.boss-inspect{min-height:44px}.boss-coverage{font-size:9px}.boss-report-heading p{max-width:390px}}@media(prefers-reduced-motion:reduce){.boss-report{scroll-behavior:auto}}
+.lower-grid>*{min-width:0}.activity-text{overflow-wrap:anywhere}
+.office-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(320px, 25vw, 390px);
+  height: calc(100svh - 158px);
+  min-height: 360px;
+  max-height: 1140px;
+}
+.office-body.reports-hidden { grid-template-columns: minmax(0, 1fr); }
+.office-viewport { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.office-body .office-scene { flex: 1; height: auto; min-height: 0; max-height: none; }
+.office-body .office-footer { flex-shrink: 0; flex-wrap: wrap; }
+.office-controls { flex-wrap: wrap; justify-content: flex-end; }
+.office-toolbar { gap: 12px; }
+.report-toggle { background: #fffdf5; }
+.report-toggle[aria-expanded=true] { background: #edf3e9; }
+.office-body .boss-report {
+  margin: 0;
+  padding: 23px 21px;
+  border: 0;
+  border-left: 1px solid var(--line);
+  border-radius: 0;
+  overflow: auto;
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
+}
+.boss-report[hidden] { display: none; }
+.office-body .boss-report-heading { align-items: flex-start; flex-direction: row; gap: 8px; }
+.office-body .boss-report-heading h2 { font-size: 27px; }
+#boss-sidebar-close { flex-shrink: 0; width: 32px; height: 32px; font-size: 21px; }
+.boss-description { font-size: 11px; line-height: 1.7; color: var(--muted); margin: 6px 0 12px; }
+.office-body .boss-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 19px 0 15px; }
+.office-body .boss-metric { padding: 12px; }
+.office-body .boss-columns { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+.office-body .boss-update,.office-body .boss-attention { gap: 8px; }
+.boss-update-copy,.boss-attention-copy { overflow-wrap: anywhere; }
+.boss-project-list { display: grid; gap: 10px; }
+.boss-project-card { padding: 12px; border: 1px solid #e4e8dc; border-radius: 8px; background: #f6f7ee; }
+.boss-project-heading { display: flex; gap: 10px; align-items: center; justify-content: space-between; }
+.boss-project-heading h4 { margin: 0; font-size: 12px; font-weight: 600; color: #405f4e; overflow-wrap: anywhere; }
+.boss-numbers { font-size: 10px; line-height: 1.8; color: #748574; margin: 8px 0; }
+.boss-record { font-size: 10px; line-height: 1.7; color: #7b8b7d; overflow-wrap: anywhere; margin: 8px 0 0; }
+.report-toggle:focus-visible,#boss-sidebar-close:focus-visible { outline: 3px solid #b39762; outline-offset: 3px; }
+@media (max-height: 780px) and (min-width: 801px) {
+  .office-body { height: calc(100svh - 150px); }
+}
+@media (max-width: 1000px) {
+  .office-body { position: relative; grid-template-columns: minmax(0, 1fr); }
+  .office-body .boss-report { position: absolute; inset: 0 0 0 auto; width: min(390px, 100%); z-index: 5; box-shadow: -12px 0 35px #30403320; }
+  .boss-report button,.report-toggle { min-height: 44px; }
+}
+@media (max-width: 800px) {
+  .office-body { height: calc(100svh - 350px); min-height: 340px; max-height: 740px; }
+  .office-body .boss-report { padding: 18px; }
+  .office-toolbar { align-items: flex-start; }
+  .office-controls { width: 100%; margin-left: 0; gap: 6px; justify-content: flex-start; }
+  .office-controls .icon-button { width: 36px; height: 36px; }
+  .office-controls .switch-label { margin-right: auto; }
+  .office-controls .switch-label span { max-width: none; }
+  .office-body .scene-bottom { flex-wrap: wrap; gap: 4px; }
+}

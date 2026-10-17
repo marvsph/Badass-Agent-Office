@@ -1,0 +1,7 @@
+*.log
+node_modules/
+output/
+.agent-office/
+.env
+.env.*
+!.env.example

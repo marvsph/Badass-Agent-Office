@@ -1,0 +1,38 @@
+.topbar{height:60px;flex-shrink:0}.office-card{margin-top:16px}.office-toolbar{min-height:66px;padding:12px 20px}.office-scene{height:calc(100svh - 196px);min-height:360px;max-height:1100px}.office-footer{min-height:34px}.intro{padding:24px 0 20px}.brand{font-size:18px;margin-bottom:27px;letter-spacing:-.6px}.brand small{font-size:8px;letter-spacing:1.5px}.sidebar .side-section{margin-bottom:16px}.building-navigation{margin-bottom:15px}#building-floors{max-height:155px;overflow:auto;margin:7px -5px 0}.floor-link{border:0;background:transparent;border-radius:7px;padding:7px 6px;width:100%;display:flex;align-items:center;gap:8px;text-align:left;font-size:10px}.floor-link b{font-weight:500;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;flex:1}.floor-link small{font-size:9px;background:#edf0e5;border-radius:4px;padding:0 4px;color:#80916e}.floor-link.selected,.floor-link:hover{background:#eef0e5}.floor-link>span{color:#91a188}.delegating{background:#a18aba}#office-level{font-size:10px;border:1px solid #e0e4d7;border-radius:5px;background:var(--white);padding:4px;color:#76816e}#open-prompt{font-size:10px;padding:6px 9px;margin-right:7px;box-shadow:none}.person-meta small{font-size:9px}.team-heading{margin-top:0}.office-scene canvas{image-rendering:pixelated}.detail-data span{max-width:195px}#prompt-dialog{width:540px;max-width:calc(100vw - 30px)}#prompt-dialog label{display:block;font-size:11px;color:#738276;margin:15px 0 6px}#prompt-dialog textarea{resize:vertical;min-height:110px;max-height:240px;width:100%;font:12px/1.6 'Segoe UI',sans-serif;border:1px solid #dce0d3;border-radius:8px;padding:11px;background:#fffef9;color:#344d42}#task-mode{padding:9px;border:1px solid #dce0d3;border-radius:7px;font-size:11px;width:100%;background:#fffef9;color:#596f60}.task-actions{display:flex;gap:10px;margin-top:15px}#task-status{font-size:11px;color:#6b8473;margin-top:16px}#task-reply{max-height:245px;overflow:auto;white-space:pre-wrap;font:11px/1.7 'Segoe UI',sans-serif;background:#f1f2e7;padding:13px;border-radius:8px;color:#536b5c}@media(min-width:1500px){.office-scene{height:calc(100svh - 196px)}.intro{padding:24px 0 20px}}@media(max-height:780px) and (min-width:801px){.sidebar{padding-top:20px}.brand{margin-bottom:20px}.side-section{margin-bottom:12px!important}#building-floors{max-height:94px}.side-bottom{margin-top:10px;padding-top:10px}.team-heading{margin-bottom:8px}.person{padding:8px 6px}.office-scene{min-height:300px;height:calc(100svh - 180px)}.topbar{height:50px}}@media(max-width:800px){.building-navigation{display:none}.office-scene{height:calc(100svh - 330px);min-height:290px;max-height:700px}.office-toolbar{gap:8px;flex-wrap:wrap;min-height:80px}.office-controls{margin-left:auto}.legend{max-width:260px}.office-footer{font-size:8px;gap:4px}.scene-tag{font-size:7px;left:11px;top:12px}.scene-bottom span:first-child{max-width:190px}.scene-bottom span:last-child{max-width:90px;text-align:right}#open-prompt{margin-right:0;font-size:9px;padding:5px}.brand{font-size:17px;margin-bottom:0}}
+.floor-list-toggle{display:flex;align-items:center;justify-content:space-between;gap:6px;cursor:pointer;list-style:none;border-radius:4px}
+.floor-list-toggle::-webkit-details-marker{display:none}
+.floor-list-toggle .eyebrow{margin:0}
+.floor-list-action{font-size:9px;color:var(--muted);flex-shrink:0}
+.floor-list-toggle:hover .floor-list-action{color:var(--ink)}
+.floor-list-toggle:focus-visible{outline:2px solid #609b92;outline-offset:4px}
+.floor-list-collapse,.building-navigation[open] .floor-list-expand{display:none}
+.building-navigation[open] .floor-list-collapse{display:inline}
+.floor-link.needs-attention{background:#faf0d8}
+.floor-link.needs-attention:hover,.floor-link.needs-attention.selected{background:#f2e3bb}
+.floor-row{display:flex;align-items:center;border-radius:7px;padding-right:4px}
+.floor-row .floor-link{flex:1;min-width:0}
+.floor-row.selected{background:#eef0e5}
+.floor-row.needs-attention{background:#faf0d8}
+.floor-row.needs-attention:hover,.floor-row.needs-attention.selected{background:#f2e3bb}
+.floor-attention,.worker-attention{display:grid;place-items:center;flex-shrink:0;width:18px;height:18px;border:0;border-radius:50%;background:#b77b25;color:#fffdf4;font-size:12px;font-weight:800;line-height:1;padding:0}
+.floor-attention{margin-left:3px}
+.floor-attention:hover{background:#895914}
+.floor-attention:focus-visible{outline-offset:1px}
+.worker-attention{width:16px;height:16px;font-size:11px}
+.office-scene{container-type:inline-size}
+.room-hover{position:absolute;right:16px;top:16px;z-index:2;display:flex;align-items:center;gap:7px;max-width:min(360px,calc(100% - 32px));padding:8px 11px;border:1px solid #c4d1bf;border-radius:7px;background:#fffef2ed;box-shadow:0 3px 12px #263e4212;color:#59745f;font-size:10px;line-height:1.5;pointer-events:none}
+.room-hover strong{font-size:8px;letter-spacing:1px;white-space:nowrap}
+.room-hover-mark{width:6px;height:6px;flex-shrink:0;border-radius:2px;background:#8aa477;box-shadow:0 0 0 3px #8aa47716}
+.room-hover-separator{color:#9cae96}
+#room-hover-purpose{min-width:0}
+.night-mode .room-hover{background:#354756ed;border-color:#657e7b80;color:#d0ded5;box-shadow:0 3px 12px #18293526}
+.night-mode .room-hover-mark{background:#a9bb8c}
+.night-mode .room-hover-separator{color:#94a9a4}
+@container(max-width:700px){.room-hover{top:48px;right:12px;max-width:calc(100% - 24px);gap:6px;font-size:9px}.room-hover strong{font-size:7px;letter-spacing:.7px}}
+.detail-portrait{width:92px;height:96px;position:relative;align-items:center;border:1px solid #dbd3bd;background:#eee7d5;box-shadow:inset 0 1px 0 #fffaf0;margin:18px 0 23px;overflow:hidden}
+.detail-portrait::after{content:'';position:absolute;inset:5px;border:1px solid #c9bda363;border-radius:13px;pointer-events:none}
+.pixel-profile{display:block;flex-shrink:0;background-image:url('/assets/office-workers-seated-v1.png');background-repeat:no-repeat;image-rendering:pixelated}
+.work-summary{margin:0 0 19px;padding:14px 15px;border:1px solid #dfe5d5;border-radius:9px;background:#f4f5eb}
+.work-summary .eyebrow{font-size:8px;letter-spacing:1.3px;color:#829078}
+.work-description{margin:8px 0 0;font-size:12px;line-height:1.65;color:#405d4d;overflow-wrap:anywhere}
+.work-evidence{margin:8px 0 0;font-size:10px;line-height:1.65;color:#7b8c7d}

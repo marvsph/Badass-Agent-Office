@@ -1,0 +1,12 @@
+@media(max-width:800px){
+  .sidebar .side-section:has(#project){display:block;margin:13px 0 0}
+  .sidebar .side-section:has(#project) .eyebrow,.sidebar .side-section:has(#project) .helper{display:none}
+  .sidebar select{margin-top:0}
+  .sidebar .side-section:has(.themes){display:block;margin:10px 0 0}
+  .sidebar .side-section:has(.themes)>.eyebrow{display:none}
+  .sidebar .themes{margin-top:0}
+  .sidebar .side-bottom{display:block;margin-top:10px;padding-top:0;border:0}
+  .sidebar .side-bottom .connection,.sidebar .side-bottom p{display:none}
+  .sidebar .side-bottom{position:absolute;right:20px;bottom:25px}
+}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}

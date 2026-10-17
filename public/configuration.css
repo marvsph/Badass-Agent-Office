@@ -1,0 +1,23 @@
+.brand-logo{width:44px;height:44px;object-fit:contain;flex-shrink:0;border-radius:9px;background:var(--white)}
+.brand-copy{min-width:0;overflow-wrap:anywhere}.brand-copy small{display:block}
+#intro-office-name{color:inherit}#scene-office-name{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.setup-state{pointer-events:auto;z-index:2;width:min(360px,calc(100% - 32px))}
+#configure-dialog{width:610px;max-width:calc(100vw - 32px);max-height:85vh;overflow:auto;box-sizing:border-box}
+.configuration-fields{padding:0;border:0;min-width:0;margin:0}
+#configure-dialog label{display:block;font-size:12px;font-weight:600;margin:14px 0 7px}
+#configure-dialog label small{font-weight:400;color:var(--muted)}
+#configure-dialog input:not([type=file]){display:block;box-sizing:border-box;width:100%;min-width:0;padding:10px 12px;background:var(--white);color:var(--ink);border:1px solid var(--line);border-radius:8px;font:inherit;font-size:12px}
+#configure-dialog input:focus-visible{outline:2px solid #648b7d;outline-offset:2px}
+.logo-settings{display:flex;align-items:center;gap:14px}.logo-settings>div{min-width:0}.logo-settings input{max-width:100%;font-size:12px}
+#logo-preview{width:64px;height:64px;object-fit:contain;border:1px solid var(--line);border-radius:9px;background:#fff}
+.configuration-section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:22px}.configuration-section-heading h3{margin:0;font-size:14px}
+.configuration-floor{margin:14px 0;padding:10px 14px 14px;border:1px solid var(--line);border-radius:10px;min-width:0}
+.configuration-floor legend{padding:0 5px;color:var(--muted);font-size:11px}
+.floor-settings-heading{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.floor-settings-heading label{margin-top:0!important}.remove-floor{font-size:11px}
+.configuration-coverage{border-radius:10px;padding:13px 15px;background:#edf1e8;margin-top:20px;font-size:12px}.configuration-coverage p{margin:6px 0 0}
+.configuration-actions{display:flex;justify-content:flex-end;gap:8px;position:sticky;bottom:-35px;background:var(--white);padding:16px 0;margin-top:6px}
+#save-configuration{background:#648b7d;color:#fff;border-color:#648b7d}
+#configuration-status{margin-bottom:0;min-height:20px}#configuration-status.settings-error{color:#ae453d}
+#configure-dialog button:disabled{opacity:.55;cursor:wait}
+@media(max-width:600px){#configure-dialog{padding:25px 20px}.configuration-actions{bottom:-25px}.brand-logo{width:38px;height:38px}.topbar-right{gap:8px}#configure{font-size:11px;padding:8px 10px}}
