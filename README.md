@@ -37,18 +37,19 @@ The launcher starts the local server in the background. If Node.js is missing, i
 
 > **First visit?** An empty building is normal. Click **Configure** to add your first project floor.
 
-<details>
-<summary><strong>On macOS or Linux?</strong></summary>
+### Install from the CLI
 
-The `.cmd` launcher is for Windows. With Node.js 24 or later installed, download and extract the repository, open a terminal in its folder, and run:
+With **Git** and **Node.js 24 or later** installed, run these commands on Windows, macOS, or Linux:
 
 ```sh
+git clone https://github.com/marvsph/Badass-Agent-Office.git
+cd Badass-Agent-Office
 npm start
 ```
 
-Visit http://127.0.0.1:4317/. Press `Ctrl+C` in that terminal to stop the server. The app has no third-party runtime dependencies; an install step isn't needed to launch it.
+Open **http://127.0.0.1:4317/**. Press `Ctrl+C` in that terminal to stop the server. The app has no third-party runtime dependencies, so you can start it immediately after cloning. `npm ci` is only needed for development checks and preview rendering.
 
-</details>
+On Windows, if PowerShell blocks `npm.ps1`, run `npm.cmd start` instead.
 
 ## Make it yours
 
